@@ -5,7 +5,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 
-import { EMPTY, Subject, Subscription, catchError } from 'rxjs';
+import { EMPTY, Subject, Subscription, catchError, map } from 'rxjs';
 
 import { Product } from '../product';
 import { ProductService } from '../product.service';
@@ -16,8 +16,7 @@ import { ProductService } from '../product.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductListAltComponent {
-  pageTitle = 'Products';
-
+  pageTitle = 'Product Detail';
   private errorMessageSubject = new Subject<string>();
   errorMessageStream$ = this.errorMessageSubject.asObservable();
 
@@ -29,6 +28,7 @@ export class ProductListAltComponent {
       return EMPTY;
     })
   );
+
   sub!: Subscription;
 
   constructor(private productService: ProductService) {}

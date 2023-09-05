@@ -3,7 +3,7 @@ import { Supplier } from '../../suppliers/supplier';
 import { Product } from '../product';
 
 import { ProductService } from '../product.service';
-import { EMPTY, Subject, catchError } from 'rxjs';
+import { EMPTY, Subject, catchError, combineLatest, filter, map } from 'rxjs';
 
 @Component({
   selector: 'pm-product-detail',
@@ -13,7 +13,12 @@ import { EMPTY, Subject, catchError } from 'rxjs';
 export class ProductDetailComponent {
   pageTitle = 'Product Detail';
 
-  productSuppliers: Supplier[] | null = null;
+  productSuppliers$ = this.productService.selectedProductSupplier$.pipe(
+    catchError((err) => {
+      this.errorMessageSubject.next(err);
+      return EMPTY;
+    })
+  );
 
   private errorMessageSubject = new Subject<string>();
   errorMessageStream$ = this.errorMessageSubject.asObservable();
@@ -25,5 +30,21 @@ export class ProductDetailComponent {
     })
   );
 
+  pageTitle$ = this.products$.pipe(
+    map((p) => (p ? `Product Detail for: ${p.productName}` : `Product Detail`))
+  );
+
+  vm$ = combineLatest([
+    this.products$,
+    this.productSuppliers$,
+    this.pageTitle$,
+  ]).pipe(
+    filter((product) => Boolean(product)),
+    map(([product, productSuppliers, pageTitle]) => ({
+      product,
+      productSuppliers,
+      pageTitle,
+    }))
+  );
   constructor(private productService: ProductService) {}
 }

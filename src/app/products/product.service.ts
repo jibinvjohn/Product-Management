@@ -5,12 +5,16 @@ import {
   BehaviorSubject,
   catchError,
   combineLatest,
+  filter,
+  forkJoin,
   map,
   merge,
   Observable,
+  of,
   scan,
   shareReplay,
   Subject,
+  switchMap,
   tap,
   throwError,
 } from 'rxjs';
@@ -18,6 +22,7 @@ import {
 import { Product } from './product';
 import { ProductCategoryService } from '../product-categories/product-category.service';
 import { SupplierService } from '../suppliers/supplier.service';
+import { Supplier } from '../suppliers/supplier';
 
 @Injectable({
   providedIn: 'root',
@@ -104,6 +109,34 @@ export class ProductService {
     newProduct = newProduct || this.fakeProduct();
     this.productInsertedSubject.next(newProduct);
   }
+
+  // Get it all Approach
+  // selectedProductSupplier$ = combineLatest([
+  //   this.selectedProduct$,
+  //   this.supplierService.suppliers$,
+  // ]).pipe(
+  //   map(([selectedProduct, suppliers]) =>
+  //     suppliers.filter((supplier) =>
+  //       selectedProduct?.supplierIds?.includes(supplier.id)
+  //     )
+  //   )
+  // );
+
+  // Just in time approach
+  selectedProductSupplier$ = this.selectedProduct$.pipe(
+    filter((product) => Boolean(product)),
+    switchMap((selectedProduct) => {
+      if (selectedProduct?.supplierIds) {
+        return forkJoin(
+          selectedProduct.supplierIds.map((supplierId) =>
+            this.http.get<Supplier>(`${this.suppliersUrl}/${supplierId}`)
+          )
+        );
+      } else {
+        return of([]);
+      }
+    })
+  );
 
   private handleError(err: HttpErrorResponse): Observable<never> {
     // in a real world app, we may send the server to some remote logging infrastructure
