@@ -9,6 +9,7 @@ import {
   merge,
   Observable,
   scan,
+  shareReplay,
   Subject,
   tap,
   throwError,
@@ -48,7 +49,8 @@ export class ProductService {
             category: categories.find((c) => product.categoryId === c.id)?.name,
           } as Product)
       )
-    )
+    ),
+    shareReplay(1)
   );
 
   // Action Steam
@@ -61,7 +63,8 @@ export class ProductService {
   ]).pipe(
     map(([products, productSelected]) => {
       return products.find((product) => product.id === productSelected);
-    })
+    }),
+    shareReplay(1)
   );
 
   // Add Products
