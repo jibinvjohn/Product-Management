@@ -50,6 +50,6 @@
 </div>
 
 <div class="alert alert-danger"
-     *ngIf="errorMessage">
+     *ngIf="errorMessageStream$ | async as errorMessage">
   {{ errorMessage }}
 </div>

@@ -2,10 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
 import {
+  BehaviorSubject,
   catchError,
   combineLatest,
   map,
+  merge,
   Observable,
+  scan,
+  Subject,
   tap,
   throwError,
 } from 'rxjs';
@@ -47,6 +51,37 @@ export class ProductService {
     )
   );
 
+  // Action Steam
+  private productSelectedSubject = new BehaviorSubject<number>(0);
+  productSelectedAction$ = this.productSelectedSubject.asObservable();
+
+  selectedProduct$ = combineLatest([
+    this.productsWithCategory$,
+    this.productSelectedAction$,
+  ]).pipe(
+    map(([products, productSelected]) => {
+      return products.find((product) => product.id === productSelected);
+    })
+  );
+
+  // Add Products
+  private productInsertedSubject = new Subject<Product>();
+  productInsertedAction$ = this.productInsertedSubject.asObservable();
+
+  productWithAdd$ = merge(
+    this.productsWithCategory$,
+    this.productInsertedAction$
+  ).pipe(
+    scan(
+      (acc, value) => (value instanceof Array ? [...value] : [...acc, value]),
+      [] as Product[]
+    )
+  );
+
+  selectedProductChange(id: number) {
+    this.productSelectedSubject.next(id);
+  }
+
   private fakeProduct(): Product {
     return {
       id: 42,
@@ -58,6 +93,11 @@ export class ProductService {
       // category: 'Toolbox',
       quantityInStock: 30,
     };
+  }
+
+  addProduct(newProduct?: Product) {
+    newProduct = newProduct || this.fakeProduct();
+    this.productInsertedSubject.next(newProduct);
   }
 
   private handleError(err: HttpErrorResponse): Observable<never> {
