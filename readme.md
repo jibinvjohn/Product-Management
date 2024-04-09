@@ -1,8 +1,9 @@
 # Apm
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.2.2.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.2.2. Tested
 
 Added packages:
+
 - npm install bootstrap
 - npm install angular-in-memory-web-api
 - ng add @angular-eslint/schematics
@@ -26,7 +27,6 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
-
 
 ## Reference
 
