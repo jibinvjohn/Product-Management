@@ -1,6 +1,4 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Supplier } from '../../suppliers/supplier';
-import { Product } from '../product';
 
 import { ProductService } from '../product.service';
 import { EMPTY, Subject, catchError, combineLatest, filter, map } from 'rxjs';
